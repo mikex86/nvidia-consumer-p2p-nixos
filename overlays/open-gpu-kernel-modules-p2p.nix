@@ -28,6 +28,9 @@ self: super: {
     '';
 
     buildPhase = ''
+      # the UVM kernel module is needed for CUDA to function (else code=999(cudaErrorUnknown) will occur)
+      # while setting this variable is not required to build the module by default, this hint will remain here for explicitness
+      export NV_UVM_ENABLE=1
       make modules -j$(nproc)
     '';
 
