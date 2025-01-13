@@ -7,7 +7,7 @@ sudo lxc exec cuda-container-01 -- su - root -c 'tmux new-session -A -s main'
 In container:
 sudo apt update
 
-Install user space libraries (no kernel modules):
+Install user space libraries (no kernel modules!):
 
 wget https://us.download.nvidia.com/XFree86/Linux-x86_64/565.57.01/NVIDIA-Linux-x86_64-565.57.01.run
 sudo bash NVIDIA-Linux-x86_64-565.57.01.run --no-kernel-modules
