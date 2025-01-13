@@ -143,8 +143,6 @@
      clang
      pciutils
      python312Full
-     google-chrome
-     betterdiscordctl
   ];
   
   # Some programs need SUID wrappers, can be configured further or are
