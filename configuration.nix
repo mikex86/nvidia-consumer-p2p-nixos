@@ -36,6 +36,7 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+  networking.networkmanager.unmanaged = [ "enp36s0f1" "br0" ];
 
   # Set your time zone.
   time.timeZone = "Europe/Vienna";
@@ -101,7 +102,7 @@
   users.users.mike = {
     isNormalUser = true;
     description = "mike";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "lxc" ];
     packages = with pkgs; [
     #  thunderbird
     ];
@@ -109,9 +110,23 @@
 
   # Blacklist Nouveau
   boot.blacklistedKernelModules = [ "nouveau" ];
-  boot.kernelParams = [ "nouveau.modeset=0" ];
+  
+  # Disable usb autosuspend
+  boot.kernelParams = [ "usbcore.autosuspend=-1" ];
+  
+  # Force load nvidia kernel modules
+  boot.kernelModules = [
+  	"nvidia"
+  	
+  	# nvidia_uvm is required for CUDA to function.
+  	# nvidia_uvm is not loaded automatically.
+  	# Without a manual nvidia_uvm load rule, CUDA initialization will fail with code=999(cudaErrorUnknown)
+  	"nvidia_uvm"
+  	
+  	"nvidia_modeset"
+  ];
 
-  # Install firefox.
+  # Install firefox
   programs.firefox.enable = true;
 
   # Allow unfree packages
@@ -123,8 +138,15 @@
      vim
      wget
      git
+     gnumake
+     gcc
+     clang
+     pciutils
+     python312Full
+     google-chrome
+     betterdiscordctl
   ];
-
+  
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -133,17 +155,46 @@
   #   enableSSHSupport = true;
   # };
 
+  # Enable LXD
+  virtualisation.lxd.enable = true;
+  
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
+  # Enable IP forwarding
+  networking = {
+    # Disable DHCP on the physical NIC so that the bridge is the one with an IP
+    interfaces.enp36s0f1.useDHCP = false;
+    
+    # Optionally, if you find that NixOS waits for a carrier, you can set:
+    # interfaces.enp36s0f1.requireCarrier = false;
 
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 22 ];
+    # Wrap interface enp36s0f1
+    bridges.br0.interfaces = [ "enp36s0f1" ];
+    
+    # Static IP config
+    #interfaces.br0.useDHCP = true;
+    interfaces.br0.ipv4.addresses = [
+      {
+        # Set a static IP for the host,
+        # Otherwise there is a death spiral where the host is unable to defend its IP lease from a container veth interface on start
+        # obtaining new leases ad finitum. I have no idea why this happens and no time to debug this because it is insane.
+        address = "10.1.1.67";
+        prefixLength = 16;
+      }
+    ];
+    defaultGateway = "10.1.1.1"; # set your gateway here
+    nameservers = [ "1.1.1.1" "8.8.8.8" ]; # maybe set your own nameservers
+
+    # Allow port 22 for ssh
+    firewall.allowedTCPPorts = [ 22 ];
+  };
+  
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
