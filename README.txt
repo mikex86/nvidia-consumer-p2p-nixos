@@ -6,7 +6,7 @@ sudo lxc config device add cuda-container-01 allnvidia gpu vendorid=10de # verif
 sudo lxc exec cuda-container-01 -- su - root -c 'tmux new-session -A -s main'
 
 In container:
-sudo apt update
+sudo apt update && sudo apt upgrade
 
 Install user space libraries (no kernel modules!):
 
