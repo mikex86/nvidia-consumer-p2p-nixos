@@ -17,6 +17,7 @@ Install CUDA (no driver!):
 Install cuda with .run file to explicitly unselect the driver from being installed.
 apt packages may pull in the driver as a dependency and or install mismatched user space libraries in the process!
 
+sudo apt install gcc
 wget https://developer.download.nvidia.com/compute/cuda/12.6.3/local_installers/cuda_12.6.3_560.35.05_linux.run
 sudo bash cuda_12.6.3_560.35.05_linux.run # make sure to unselect driver and kernel objects
 
