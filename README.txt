@@ -1,6 +1,7 @@
 How to launch a container:
 
-lxc launch ubuntu:24.04 cuda-container-01 --profile bridged
+sudo lxc launch ubuntu:24.04 cuda-container-01
+sudo lxc profile add cuda-container-01 bridged # create a bridged profile to get internet access
 sudo lxc config device add cuda-container-01 allnvidia gpu vendorid=10de # verify vendor id here
 sudo lxc exec cuda-container-01 -- su - root -c 'tmux new-session -A -s main'
 
